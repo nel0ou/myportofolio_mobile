@@ -118,7 +118,6 @@ Aplikasi belum menggunakan database atau penyimpanan permanen. Oleh karena itu, 
 | Pengujian | Menjalankan aplikasi melalui Chrome dan memeriksa kode menggunakan `flutter analyze`. |
 | Dokumentasi | Menyusun README, AI disclosure, dan refleksi pembelajaran. |
 
-*Catatan: Tabel ini merupakan rangkuman tahapan pengerjaan. Sesuaikan nama minggu dan urutannya dengan jadwal pengerjaan tugas yang sebenarnya.*
 
 ## AI Disclosure (Deklarasi Penggunaan AI)
 

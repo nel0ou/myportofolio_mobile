@@ -107,25 +107,6 @@ Pada versi saat ini, data proyek disimpan sementara menggunakan `List<Project>` 
 
 Aplikasi belum menggunakan database atau penyimpanan permanen. Oleh karena itu, data proyek yang ditambahkan atau diubah akan kembali ke data awal ketika aplikasi dimulai ulang.
 
-## Progress Pengerjaan Mingguan
-
-| Tahap | Progress |
-|---|---|
-| Pengembangan awal | Membuat struktur proyek Flutter dan halaman utama portfolio. |
-| Pengembangan komponen | Membuat model data, InfoCard, ItemCard, dan menu navigasi. |
-| Pengembangan fitur proyek | Membuat halaman daftar proyek, detail proyek, dan formulir tambah proyek. |
-| Pengembangan CRUD | Menambahkan fitur edit proyek dan hapus proyek dengan dialog konfirmasi. |
-| Pengujian | Menjalankan aplikasi melalui Chrome dan memeriksa kode menggunakan `flutter analyze`. |
-| Dokumentasi | Menyusun README, AI disclosure, dan refleksi pembelajaran. |
-
-
-## AI Disclosure (Deklarasi Penggunaan AI)
-
-Dalam proses pengembangan MyPortfolio Mobile, saya menggunakan ChatGPT sebagai alat bantu pembelajaran dan pendamping dalam memahami konsep serta implementasi Flutter.
-
-Penggunaan AI dilakukan untuk membantu proses pemahaman, penyelesaian masalah, dan penyusunan dokumentasi. AI tidak digunakan sebagai pengganti pemahaman dan pemeriksaan mandiri terhadap kode program.
-
-
 # Pertanyaan Reflektif
 
 ## Tugas 7

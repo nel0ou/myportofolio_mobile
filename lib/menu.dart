@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // ==========================================
-// 1. MODEL DATA TOMBOL MENU
+// 1. MODEL DATA MENU
 // ==========================================
 
 class ItemHomepage {
@@ -47,7 +47,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final String nama = "Naila Salsabila";
   final String kelas = "Kelas C";
 
-  // Data proyek awal.
   final List<Project> projects = [
     const Project(
       title: "Website Portfolio",
@@ -247,7 +246,7 @@ class InfoCard extends StatelessWidget {
 }
 
 // ==========================================
-// 5. KOMPONEN KARTU TOMBOL AKSI
+// 5. KOMPONEN KARTU MENU
 // ==========================================
 
 class ItemCard extends StatelessWidget {
@@ -315,7 +314,6 @@ class ProjectListPage extends StatefulWidget {
 }
 
 class _ProjectListPageState extends State<ProjectListPage> {
-
   // Membuka formulir tambah proyek.
   Future<void> _addProject() async {
     final newProject = await Navigator.push<Project>(
@@ -340,22 +338,34 @@ class _ProjectListPageState extends State<ProjectListPage> {
     }
   }
 
-  // Menghapus proyek dari daftar.
-  void _deleteProject(Project project) {
-    setState(() {
-      widget.projects.remove(project);
-    });
-  }
-
   // Membuka halaman detail proyek.
   void _openProjectDetail(Project project) {
+    final projectIndex = widget.projects.indexOf(project);
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ProjectDetailPage(
           project: project,
+
+          // Callback untuk menghapus proyek.
           onDelete: () {
-            _deleteProject(project);
+            if (projectIndex >= 0 &&
+                projectIndex < widget.projects.length) {
+              setState(() {
+                widget.projects.removeAt(projectIndex);
+              });
+            }
+          },
+
+          // Callback untuk memperbarui proyek.
+          onUpdate: (updatedProject) {
+            if (projectIndex >= 0 &&
+                projectIndex < widget.projects.length) {
+              setState(() {
+                widget.projects[projectIndex] = updatedProject;
+              });
+            }
           },
         ),
       ),
@@ -459,7 +469,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
     }
   }
 
-  // Menyimpan data proyek.
+  // Menyimpan proyek baru.
   void _saveProject() {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -472,13 +482,11 @@ class _AddProjectPageState extends State<AddProjectPage> {
       icon: _getProjectIcon(_selectedCategory),
     );
 
-    // Mengirim data proyek ke halaman sebelumnya.
     Navigator.pop(context, newProject);
   }
 
   @override
   void dispose() {
-    // Membersihkan controller setelah halaman ditutup.
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -527,7 +535,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
 
               const SizedBox(height: 20),
 
-              // Pilihan kategori proyek.
+              // Pilihan kategori.
               DropdownButtonFormField<String>(
                 initialValue: _selectedCategory,
                 decoration: const InputDecoration(
@@ -599,28 +607,271 @@ class _AddProjectPageState extends State<AddProjectPage> {
 }
 
 // ==========================================
-// 8. HALAMAN DETAIL PROYEK
+// 8. HALAMAN EDIT PROYEK
 // ==========================================
 
-class ProjectDetailPage extends StatelessWidget {
+class EditProjectPage extends StatefulWidget {
+  final Project project;
+
+  const EditProjectPage({
+    super.key,
+    required this.project,
+  });
+
+  @override
+  State<EditProjectPage> createState() => _EditProjectPageState();
+}
+
+class _EditProjectPageState extends State<EditProjectPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+
+  late String _selectedCategory;
+
+  final List<String> categories = [
+    "Web Development",
+    "Mobile Development",
+    "Information System",
+    "UI/UX Design",
+    "Other",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Mengisi form dengan data proyek sebelumnya.
+    _titleController = TextEditingController(
+      text: widget.project.title,
+    );
+
+    _descriptionController = TextEditingController(
+      text: widget.project.description,
+    );
+
+    _selectedCategory = widget.project.category;
+  }
+
+  // Menentukan ikon berdasarkan kategori.
+  IconData _getProjectIcon(String category) {
+    switch (category) {
+      case "Web Development":
+        return Icons.language;
+      case "Mobile Development":
+        return Icons.phone_android;
+      case "Information System":
+        return Icons.school;
+      case "UI/UX Design":
+        return Icons.design_services;
+      default:
+        return Icons.work;
+    }
+  }
+
+  // Menyimpan perubahan proyek.
+  void _updateProject() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final updatedProject = Project(
+      title: _titleController.text.trim(),
+      description: _descriptionController.text.trim(),
+      category: _selectedCategory,
+      icon: _getProjectIcon(_selectedCategory),
+    );
+
+    Navigator.pop(context, updatedProject);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Edit Proyek"),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Ubah Informasi Proyek",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Input nama proyek.
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: "Nama Proyek",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.work),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Nama proyek tidak boleh kosong.";
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Pilihan kategori.
+              DropdownButtonFormField<String>(
+                initialValue: _selectedCategory,
+                decoration: const InputDecoration(
+                  labelText: "Kategori Proyek",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.category),
+                ),
+                items: categories.map((category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  }
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Input deskripsi proyek.
+              TextFormField(
+                controller: _descriptionController,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  labelText: "Deskripsi Proyek",
+                  border: OutlineInputBorder(),
+                  alignLabelWithHint: true,
+                  prefixIcon: Icon(Icons.description),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Deskripsi proyek tidak boleh kosong.";
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 28),
+
+              // Tombol simpan perubahan.
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _updateProject,
+                  icon: const Icon(Icons.save),
+                  label: const Text("Simpan Perubahan"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 9. HALAMAN DETAIL PROYEK
+// ==========================================
+
+class ProjectDetailPage extends StatefulWidget {
   final Project project;
   final VoidCallback onDelete;
+  final ValueChanged<Project> onUpdate;
 
   const ProjectDetailPage({
     super.key,
     required this.project,
     required this.onDelete,
+    required this.onUpdate,
   });
 
+  @override
+  State<ProjectDetailPage> createState() =>
+      _ProjectDetailPageState();
+}
+
+class _ProjectDetailPageState extends State<ProjectDetailPage> {
+  late Project _project;
+
+  @override
+  void initState() {
+    super.initState();
+    _project = widget.project;
+  }
+
+  // Membuka halaman edit proyek.
+  Future<void> _editProject() async {
+    final updatedProject = await Navigator.push<Project>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProjectPage(
+          project: _project,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (updatedProject != null) {
+      setState(() {
+        _project = updatedProject;
+      });
+
+      widget.onUpdate(updatedProject);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Proyek berhasil diperbarui!"),
+        ),
+      );
+    }
+  }
+
   // Dialog konfirmasi sebelum menghapus proyek.
-  Future<void> _confirmDelete(BuildContext context) async {
-    final bool? confirmed = await showDialog<bool>(
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text("Hapus Proyek?"),
           content: Text(
-            'Apakah kamu yakin ingin menghapus "${project.title}"?',
+            'Apakah kamu yakin ingin menghapus "${_project.title}"?',
           ),
           actions: [
             TextButton(
@@ -644,15 +895,13 @@ class ProjectDetailPage extends StatelessWidget {
       },
     );
 
-    if (confirmed != true || !context.mounted) {
-      return;
-    }
+    if (!mounted || confirmed != true) return;
 
-    // Menghapus proyek dari daftar.
-    onDelete();
-
-    // Menampilkan notifikasi pada halaman sebelumnya.
+    // Menyimpan messenger sebelum halaman ditutup.
     final messenger = ScaffoldMessenger.of(context);
+
+    // Memanggil fungsi hapus di halaman daftar.
+    widget.onDelete();
 
     Navigator.pop(context);
 
@@ -671,10 +920,18 @@ class ProjectDetailPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         actions: [
+          // Tombol edit.
+          IconButton(
+            tooltip: "Edit Proyek",
+            icon: const Icon(Icons.edit),
+            onPressed: _editProject,
+          ),
+
+          // Tombol hapus.
           IconButton(
             tooltip: "Hapus Proyek",
             icon: const Icon(Icons.delete),
-            onPressed: () => _confirmDelete(context),
+            onPressed: _confirmDelete,
           ),
         ],
       ),
@@ -689,13 +946,13 @@ class ProjectDetailPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    project.icon,
+                    _project.icon,
                     size: 64,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    project.title,
+                    _project.title,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 22,
@@ -704,14 +961,14 @@ class ProjectDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    project.category,
+                    _project.category,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                   const Divider(height: 32),
                   Text(
-                    project.description,
+                    _project.description,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 16),
                   ),

@@ -35,19 +35,15 @@ class Project {
 // 3. HALAMAN UTAMA
 // ==========================================
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   final String npm = "2506620702";
   final String nama = "Naila Salsabila";
   final String kelas = "Kelas C";
 
-  final List<Project> projects = [
+  // Data proyek awal.
+  static final List<Project> projects = [
     const Project(
       title: "Website Portfolio",
       description:
@@ -71,14 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
   ];
 
-  final List<ItemHomepage> items = [
-    const ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
-    const ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.green),
-    const ItemHomepage("Logout", Icons.logout, Colors.red),
+  final List<ItemHomepage> items = const [
+    ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
+    ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.green),
+    ItemHomepage("Logout", Icons.logout, Colors.red),
   ];
 
   // Membuka halaman tambah proyek.
-  Future<void> _openAddProject() async {
+  Future<void> _openAddProject(BuildContext context) async {
     final newProject = await Navigator.push<Project>(
       context,
       MaterialPageRoute(
@@ -86,12 +82,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
 
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     if (newProject != null) {
-      setState(() {
-        projects.add(newProject);
-      });
+      projects.add(newProject);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -102,36 +96,34 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // Membuka halaman daftar proyek.
-  void _openProjectList() {
+  void _openProjectList(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ProjectListPage(
           projects: projects,
           onAddProject: (project) {
-            setState(() {
-              projects.add(project);
-            });
+            projects.add(project);
           },
         ),
       ),
     );
   }
 
-  // Mengatur aksi tombol menu.
-  void _handleMenuTap(ItemHomepage item) {
-    if (item.name == "Lihat Proyek") {
-      _openProjectList();
-    } else if (item.name == "Tambah Proyek") {
-      _openAddProject();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Fitur Logout belum dihubungkan ke autentikasi.",
-          ),
+  // Mengatur aksi tombol menu dan SnackBar.
+  void _handleMenuTap(BuildContext context, ItemHomepage item) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Kamu telah menekan tombol ${item.name}!",
         ),
-      );
+      ),
+    );
+
+    if (item.name == "Lihat Proyek") {
+      _openProjectList(context);
+    } else if (item.name == "Tambah Proyek") {
+      _openAddProject(context);
     }
   }
 
@@ -194,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: items.map((item) {
                 return ItemCard(
                   item: item,
-                  onTap: () => _handleMenuTap(item),
+                  onTap: () => _handleMenuTap(context, item),
                 );
               }).toList(),
             ),

@@ -278,18 +278,8 @@ ChatGPT digunakan untuk membantu:
 - Memperbaiki kode yang mengalami error.
 - Membantu menyusun dokumentasi proyek.
 
-### 2. Strategi Prompting
 
-Saya memberikan kode atau menjelaskan bagian yang sedang dikerjakan, kemudian meminta bantuan sesuai permasalahan yang ditemukan. Saya juga meminta penjelasan menggunakan bahasa sederhana agar lebih mudah memahami fungsi kode.
-
-Contoh prompt yang digunakan:
-- "Jelaskan alur kerja kode Flutter saya."
-- "Bantu saya membuat fitur tambah proyek."
-- "Bagaimana cara membuat fitur edit dan hapus proyek?"
-- "Berikan kode lengkap yang sudah disesuaikan dengan kode sebelumnya."
-- "Bantu saya memahami error dari flutter analyze."
-
-### 3. Keterbatasan AI dan Perbaikan
+### 2. Keterbatasan AI dan Perbaikan
 
 Selama menggunakan ChatGPT, saya menemukan bahwa kode yang diberikan terkadang belum sepenuhnya sesuai dengan struktur proyek. Beberapa bagian juga perlu disesuaikan agar dapat berjalan dengan baik.
 
@@ -299,12 +289,12 @@ Karena itu, saya tetap melakukan pemeriksaan secara mandiri dengan cara:
 - Menjalankan `flutter analyze` untuk memeriksa kode.
 - Menjalankan aplikasi melalui Chrome untuk mencoba fitur tambah, edit, dan hapus proyek.
 
-### 4. Refleksi
+### 3. Refleksi
 
 Menurut saya, ChatGPT cukup membantu dalam memahami Flutter, terutama ketika menemukan bagian kode yang belum saya pahami. Namun, jawaban AI tidak selalu bisa langsung digunakan sehingga saya tetap perlu membaca, menyesuaikan, dan mencoba kode tersebut sendiri.
 
 Dari proses ini, saya belajar bahwa AI dapat digunakan sebagai alat bantu belajar, tetapi pemahaman terhadap kode dan hasil akhirnya tetap menjadi tanggung jawab saya.
 
-### 5. Bukti Penggunaan AI
+### 4. Bukti Penggunaan AI
 https://chatgpt.com/share/6af5d468-81c0-83ec-87b7-9bebfbfd850a
 

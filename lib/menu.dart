@@ -1,10 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-// ==================================================
 // MODEL DATA TOMBOL MENU
-// ==================================================
-
 class ItemHomepage {
   final String name;
   final IconData icon;
@@ -13,35 +10,33 @@ class ItemHomepage {
   const ItemHomepage(this.name, this.icon, this.color);
 }
 
-// ==================================================
-// HALAMAN UTAMA PORTOFOLIO
-// ==================================================
+// MODEL DATA PROYEK
+class Project {
+  final String title;
+  final String description;
+  final String category;
+  final IconData icon;
 
+  const Project({
+    required this.title,
+    required this.description,
+    required this.category,
+    required this.icon,
+  });
+}
+
+// HALAMAN UTAMA
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
 
-  // Data pemilik portofolio
   final String npm = "2506620702";
   final String nama = "Naila Salsabila";
   final String kelas = "Kelas C";
 
-  // Daftar tombol menu beserta ikon dan warnanya
   final List<ItemHomepage> items = [
-    const ItemHomepage(
-      "Lihat Proyek",
-      Icons.folder,
-      Colors.blue,
-    ),
-    const ItemHomepage(
-      "Tambah Proyek",
-      Icons.add_circle,
-      Colors.green,
-    ),
-    const ItemHomepage(
-      "Logout",
-      Icons.logout,
-      Colors.red,
-    ),
+    const ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
+    const ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.green),
+    const ItemHomepage("Logout", Icons.logout, Colors.red),
   ];
 
   @override
@@ -49,7 +44,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'MyPortfolio',
+          "MyPortfolio",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -57,62 +52,56 @@ class MyHomePage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // KARTU INFORMASI PEMILIK
               Row(
                 children: [
-                  Expanded(
-                    child: InfoCard(
-                      title: 'NPM',
-                      content: npm,
-                    ),
-                  ),
-                  Expanded(
-                    child: InfoCard(
-                      title: 'Nama',
-                      content: nama,
-                    ),
-                  ),
-                  Expanded(
-                    child: InfoCard(
-                      title: 'Kelas',
-                      content: kelas,
-                    ),
-                  ),
+                  Expanded(child: InfoCard(title: "NPM", content: npm)),
+                  Expanded(child: InfoCard(title: "Nama", content: nama)),
+                  Expanded(child: InfoCard(title: "Kelas", content: kelas)),
                 ],
               ),
-
               const SizedBox(height: 32),
-
-              // TULISAN SAMBUTAN
               const Text(
-                'Selamat datang di MyPortfolio Mobile!',
+                "Selamat datang di MyPortfolio Mobile!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
+                  fontSize: 18,
                 ),
               ),
-
               const SizedBox(height: 24),
-
-              // KARTU TOMBOL AKSI
               GridView.count(
-                primary: false,
-                padding: const EdgeInsets.all(4),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
                 crossAxisCount: 3,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                children: items.map((ItemHomepage item) {
-                  return ItemCard(item: item);
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                children: items.map((item) {
+                  return ItemCard(
+                    item: item,
+                    onTap: () {
+                      if (item.name == "Lihat Proyek") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProjectListPage(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Kamu menekan tombol ${item.name}!",
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  );
                 }).toList(),
               ),
             ],
@@ -123,10 +112,7 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-// ==================================================
 // KOMPONEN KARTU INFORMASI
-// ==================================================
-
 class InfoCard extends StatelessWidget {
   final String title;
   final String content;
@@ -140,22 +126,17 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2.0,
-      child: Container(
-        padding: const EdgeInsets.all(12.0),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8.0),
-            Text(
-              content,
-              textAlign: TextAlign.center,
-            ),
+            const SizedBox(height: 8),
+            Text(content, textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -163,16 +144,15 @@ class InfoCard extends StatelessWidget {
   }
 }
 
-// ==================================================
 // KOMPONEN KARTU TOMBOL AKSI
-// ==================================================
-
 class ItemCard extends StatelessWidget {
   final ItemHomepage item;
+  final VoidCallback onTap;
 
   const ItemCard({
     super.key,
     required this.item,
+    required this.onTap,
   });
 
   @override
@@ -182,52 +162,19 @@ class ItemCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-
-        // Aksi ketika tombol ditekan
-        onTap: () {
-          if (item.name == "Lihat Proyek") {
-            // Membuka halaman daftar proyek
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ProjectPage(),
+        onTap: onTap,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(item.icon, color: Colors.white, size: 30),
+              const SizedBox(height: 8),
+              Text(
+                item.name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white),
               ),
-            );
-          } else {
-            // Menampilkan SnackBar untuk tombol lainnya
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "Kamu telah menekan tombol ${item.name}!",
-                  ),
-                ),
-              );
-          }
-        },
-
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 30,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -235,18 +182,32 @@ class ItemCard extends StatelessWidget {
   }
 }
 
-// ==================================================
 // HALAMAN DAFTAR PROYEK
-// ==================================================
+class ProjectListPage extends StatelessWidget {
+  const ProjectListPage({super.key});
 
-class ProjectPage extends StatelessWidget {
-  const ProjectPage({super.key});
-
-  // Data contoh proyek
-  final List<String> projects = const [
-    "Website Portfolio",
-    "Aplikasi Mobile Portfolio",
-    "Sistem Informasi Akademik",
+  final List<Project> projects = const [
+    Project(
+      title: "Website Portfolio",
+      description:
+          "Website portfolio pribadi untuk menampilkan profil, pengalaman, dan proyek yang telah dikerjakan.",
+      category: "Web Development",
+      icon: Icons.language,
+    ),
+    Project(
+      title: "Aplikasi Mobile Portfolio",
+      description:
+          "Aplikasi mobile berbasis Flutter untuk menampilkan informasi pemilik portfolio dan daftar proyek.",
+      category: "Mobile Development",
+      icon: Icons.phone_android,
+    ),
+    Project(
+      title: "Sistem Informasi Akademik",
+      description:
+          "Sistem informasi untuk membantu pengelolaan data dan informasi akademik.",
+      category: "Information System",
+      icon: Icons.school,
+    ),
   ];
 
   @override
@@ -257,28 +218,101 @@ class ProjectPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
-
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: projects.length,
         itemBuilder: (context, index) {
+          final project = projects[index];
+
           return Card(
             elevation: 2,
             margin: const EdgeInsets.only(bottom: 12),
             child: ListTile(
-              leading: const Icon(
-                Icons.folder,
-                color: Colors.indigo,
+              leading: Icon(
+                project.icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 30,
               ),
-              title: Text(projects[index]),
-              subtitle: const Text("Proyek Portofolio"),
-              trailing: const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-              ),
+              title: Text(project.title),
+              subtitle: Text("Proyek ${project.category}"),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProjectDetailPage(
+                      project: project,
+                    ),
+                  ),
+                );
+              },
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// HALAMAN DETAIL PROYEK
+class ProjectDetailPage extends StatelessWidget {
+  final Project project;
+
+  const ProjectDetailPage({
+    super.key,
+    required this.project,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Detail Proyek"),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Card(
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    project.icon,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    project.title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    project.category,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  const Divider(height: 32),
+                  Text(
+                    project.description,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final String nama = "Naila Salsabila";
   final String kelas = "Kelas C";
 
-  // Daftar proyek awal.
+  // Data proyek awal.
   final List<Project> projects = [
     const Project(
       title: "Website Portfolio",
@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const ItemHomepage("Logout", Icons.logout, Colors.red),
   ];
 
-  // Membuka halaman tambah proyek dari halaman utama.
+  // Membuka halaman tambah proyek.
   Future<void> _openAddProject() async {
     final newProject = await Navigator.push<Project>(
       context,
@@ -87,7 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
 
-    // Memastikan halaman masih aktif setelah await.
     if (!mounted) return;
 
     if (newProject != null) {
@@ -316,7 +315,8 @@ class ProjectListPage extends StatefulWidget {
 }
 
 class _ProjectListPageState extends State<ProjectListPage> {
-  // Membuka formulir tambah proyek dari daftar proyek.
+
+  // Membuka formulir tambah proyek.
   Future<void> _addProject() async {
     final newProject = await Navigator.push<Project>(
       context,
@@ -338,6 +338,28 @@ class _ProjectListPageState extends State<ProjectListPage> {
         ),
       );
     }
+  }
+
+  // Menghapus proyek dari daftar.
+  void _deleteProject(Project project) {
+    setState(() {
+      widget.projects.remove(project);
+    });
+  }
+
+  // Membuka halaman detail proyek.
+  void _openProjectDetail(Project project) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProjectDetailPage(
+          project: project,
+          onDelete: () {
+            _deleteProject(project);
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -381,14 +403,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
                       size: 16,
                     ),
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProjectDetailPage(
-                            project: project,
-                          ),
-                        ),
-                      );
+                      _openProjectDetail(project);
                     },
                   ),
                 );
@@ -457,7 +472,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
       icon: _getProjectIcon(_selectedCategory),
     );
 
-    // Mengembalikan proyek ke halaman sebelumnya.
+    // Mengirim data proyek ke halaman sebelumnya.
     Navigator.pop(context, newProject);
   }
 
@@ -589,11 +604,64 @@ class _AddProjectPageState extends State<AddProjectPage> {
 
 class ProjectDetailPage extends StatelessWidget {
   final Project project;
+  final VoidCallback onDelete;
 
   const ProjectDetailPage({
     super.key,
     required this.project,
+    required this.onDelete,
   });
+
+  // Dialog konfirmasi sebelum menghapus proyek.
+  Future<void> _confirmDelete(BuildContext context) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text("Hapus Proyek?"),
+          content: Text(
+            'Apakah kamu yakin ingin menghapus "${project.title}"?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              child: const Text("Hapus"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !context.mounted) {
+      return;
+    }
+
+    // Menghapus proyek dari daftar.
+    onDelete();
+
+    // Menampilkan notifikasi pada halaman sebelumnya.
+    final messenger = ScaffoldMessenger.of(context);
+
+    Navigator.pop(context);
+
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text("Proyek berhasil dihapus!"),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -602,6 +670,13 @@ class ProjectDetailPage extends StatelessWidget {
         title: const Text("Detail Proyek"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            tooltip: "Hapus Proyek",
+            icon: const Icon(Icons.delete),
+            onPressed: () => _confirmDelete(context),
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(

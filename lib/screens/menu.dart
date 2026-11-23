@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:myportofolio_mobile/screens/project_form.dart';
+import 'package:myportofolio_mobile/screens/experience_form.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 import 'package:myportofolio_mobile/widgets/project_card.dart';
 
@@ -11,14 +12,16 @@ class MyHomePage extends StatelessWidget {
   final String nama = 'Naila Salsabila';
   final String kelas = 'Kelas C';
 
+  // Daftar kartu menu halaman utama.
   final List<ItemHomepage> items = const [
     ItemHomepage('Lihat Proyek', Icons.folder, Colors.blue),
     ItemHomepage('Tambah Proyek', Icons.add_circle, Colors.green),
+    ItemHomepage('Pengalaman', Icons.work, Colors.deepPurple),
     ItemHomepage('Logout', Icons.logout, Colors.red),
   ];
 
+  // Mengatur aksi ketika kartu ditekan.
   void _handleMenuTap(BuildContext context, ItemHomepage item) {
-    // Menampilkan SnackBar ketika tombol ditekan.
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -29,12 +32,18 @@ class MyHomePage extends StatelessWidget {
         ),
       );
 
-    // Navigasi ke halaman form ketika Tambah Proyek ditekan.
     if (item.name == 'Tambah Proyek') {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const ProjectFormPage(),
+        ),
+      );
+    } else if (item.name == 'Pengalaman') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ExperienceFormPage(),
         ),
       );
     }
@@ -55,7 +64,6 @@ class MyHomePage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
 
-      // Drawer untuk navigasi halaman.
       drawer: LeftDrawer(
         onHomeTap: () {
           Navigator.pushReplacement(
@@ -73,6 +81,14 @@ class MyHomePage extends StatelessWidget {
             ),
           );
         },
+        onExperienceTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ExperienceFormPage(),
+            ),
+          );
+        },
       ),
 
       body: SingleChildScrollView(
@@ -80,7 +96,6 @@ class MyHomePage extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Informasi pemilik portfolio.
               Row(
                 children: [
                   Expanded(
@@ -117,14 +132,13 @@ class MyHomePage extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Menampilkan tiga tombol menu.
               GridView.count(
-                crossAxisCount: 3,
+                crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 0.85,
+                childAspectRatio: 1.2,
                 children: items.map((item) {
                   return ItemCard(
                     item: item,

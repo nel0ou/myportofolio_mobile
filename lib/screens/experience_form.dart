@@ -171,6 +171,14 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
             ),
           );
         },
+        onExperienceTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ExperienceFormPage(),
+            ),
+          );
+        },
       ),
 
       body: Form(

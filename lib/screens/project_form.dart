@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
+import 'package:myportofolio_mobile/screens/experience_form.dart';
 
 class ProjectFormPage extends StatefulWidget {
   const ProjectFormPage({super.key});
@@ -83,6 +84,7 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
         foregroundColor: Colors.white,
       ),
 
+
       drawer: LeftDrawer(
         onHomeTap: () {
           Navigator.pushReplacement(
@@ -100,7 +102,16 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
             ),
           );
         },
+        onExperienceTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ExperienceFormPage(),
+            ),
+          );
+        },
       ),
+
 
       body: Form(
         key: _formKey,

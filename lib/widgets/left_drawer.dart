@@ -2,13 +2,16 @@
 import 'package:flutter/material.dart';
 
 class LeftDrawer extends StatelessWidget {
+  // Callback untuk setiap menu navigasi.
   final VoidCallback onHomeTap;
   final VoidCallback onAddProjectTap;
+  final VoidCallback onExperienceTap;
 
   const LeftDrawer({
     super.key,
     required this.onHomeTap,
     required this.onAddProjectTap,
+    required this.onExperienceTap,
   });
 
   @override
@@ -17,6 +20,7 @@ class LeftDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
+          // Header Drawer.
           const DrawerHeader(
             decoration: BoxDecoration(
               color: Colors.indigo,
@@ -43,6 +47,8 @@ class LeftDrawer extends StatelessWidget {
               ],
             ),
           ),
+
+          // Menu Home.
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
@@ -51,12 +57,24 @@ class LeftDrawer extends StatelessWidget {
               onHomeTap();
             },
           ),
+
+          // Menu Add Project.
           ListTile(
             leading: const Icon(Icons.add_circle_outline),
             title: const Text('Add Project'),
             onTap: () {
               Navigator.pop(context);
               onAddProjectTap();
+            },
+          ),
+
+          // Menu Add Experience.
+          ListTile(
+            leading: const Icon(Icons.work_outline),
+            title: const Text('Add Experience'),
+            onTap: () {
+              Navigator.pop(context);
+              onExperienceTap();
             },
           ),
         ],

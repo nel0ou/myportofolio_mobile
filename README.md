@@ -298,3 +298,66 @@ Dari proses ini, saya belajar bahwa AI dapat digunakan sebagai alat bantu belaja
 ### 4. Bukti Penggunaan AI
 https://chatgpt.com/share/6af5d468-81c0-83ec-87b7-9bebfbfd850a
 
+### Tugas 8
+
+#### Pertanyaan Reflektif
+
+**1. Jelaskan perbedaan antara `Navigator.push()`, `Navigator.pushReplacement()`, dan `Navigator.pop()`. Metode apa yang digunakan untuk membuka formulir dari kartu aksi? Jelaskan juga bagaimana opsi Home di drawer membawa pengguna kembali ke halaman utama.**
+
+`Navigator.push()` digunakan untuk membuka halaman baru tanpa menghapus halaman sebelumnya dari navigation stack. Dengan demikian, pengguna dapat kembali ke halaman sebelumnya menggunakan tombol kembali bawaan perangkat atau browser.
+
+`Navigator.pushReplacement()` digunakan untuk membuka halaman baru sekaligus menggantikan halaman yang sedang aktif. Artinya, halaman sebelumnya tidak lagi menjadi halaman yang dapat dikembalikan melalui tombol kembali.
+
+Sementara itu, `Navigator.pop()` digunakan untuk menutup halaman atau route yang sedang aktif dan kembali ke halaman sebelumnya.
+
+Pada proyek ini, `Navigator.push()` digunakan untuk membuka halaman formulir Pengalaman melalui kartu aksi di halaman utama. Metode ini dipilih agar pengguna tetap dapat kembali ke halaman utama menggunakan tombol kembali.
+
+Untuk opsi Home pada Drawer, digunakan `Navigator.pushReplacement()` dengan tujuan mengarahkan pengguna ke `MyHomePage` sekaligus menggantikan halaman formulir yang sedang dibuka. Dengan begitu, pengguna dapat kembali ke halaman utama melalui menu Drawer tanpa menumpuk halaman baru di navigation stack.
+
+**2. Bagaimana susunan Scaffold, AppBar, dan Drawer membantu menjaga struktur halaman tetap konsisten? Berikan satu contoh penggunaan warna tema portofolio di lebih dari satu halaman.**
+
+`Scaffold` berfungsi sebagai kerangka utama halaman yang menyediakan struktur dasar seperti AppBar, Drawer, dan body. `AppBar` digunakan untuk menampilkan judul halaman serta memberikan identitas visual yang konsisten. Sementara itu, `Drawer` menyediakan navigasi utama agar pengguna dapat berpindah antarhalaman dengan mudah.
+
+Penggunaan struktur tersebut pada halaman utama, formulir proyek, dan formulir pengalaman membuat tampilan serta navigasi aplikasi terasa konsisten. Drawer yang sama juga digunakan kembali pada halaman formulir sehingga pengguna tidak perlu mempelajari pola navigasi yang berbeda.
+
+Contoh penerapan warna tema portofolio adalah penggunaan warna `Colors.indigo` pada AppBar dan DrawerHeader. Warna tersebut juga digunakan sebagai warna utama melalui `ColorScheme.fromSeed(seedColor: Colors.indigo)` pada konfigurasi tema aplikasi. Hal ini membantu menjaga identitas visual ant halaman.
+
+**3. Mengapa tata letak tersebut dipilih untuk formulir? Jelaskan peran widget pengatur jarak dan widget penggulir ketika ruang layar terbatas.**
+
+Formulir menggunakan `SingleChildScrollView` agar seluruh kolom input tetap dapat diakses meskipun ukuran layar terbatas atau keyboard sedang terbuka. Tanpa widget penggulir, bagian bawah formulir seperti tombol Simpan berisiko tidak terlihat atau sulit dijangkau.
+
+Widget pengatur jarak seperti `SizedBox` digunakan untuk memberikan jarak antar-elemen, misalnya antara judul, kolom input, dan tombol. Jarak yang konsisten membuat formulir lebih rapi, mudah dibaca, dan tidak terlihat terlalu padat.
+
+Kombinasi kedua widget tersebut dipilih agar formulir tetap nyaman digunakan pada berbagai ukuran layar, baik layar komputer maupun perangkat dengan layar lebih kecil.
+
+**4. Apa peran GlobalKey<FormState>, validator, dan validate() saat tombol Simpan ditekan? Berikan satu contoh nilai yang ditolak oleh validasi dan jelaskan mengapa memilih jenis input atau papan ketik saja belum cukup.**
+
+`GlobalKey<FormState>` digunakan untuk mengidentifikasi dan mengakses status Form dari bagian lain dalam widget, termasuk ketika tombol Simpan ditekan.
+
+`validator` berfungsi untuk memeriksa apakah nilai yang dimasukkan pengguna sudah memenuhi ketentuan. Sementara itu, `validate()` menjalankan seluruh validator pada input yang berada di dalam Form dan mengembalikan nilai `true` apabila seluruh input valid atau `false` apabila terdapat input yang tidak valid.
+
+Pada proyek ini, tombol Simpan memanggil `_formKey.currentState!.validate()`. Jika validasi berhasil, aplikasi menampilkan `AlertDialog` yang berisi ringkasan seluruh isian. Jika tidak, pesan kesalahan ditampilkan pada kolom yang bermasalah.
+
+Contoh nilai yang ditolak adalah deskripsi pengalaman yang hanya berisi spasi atau memiliki panjang kurang dari 10 karakter. Nilai tersebut tidak memenuhi ketentuan validasi meskipun pengguna dapat mengetiknya.
+
+Pemilihan jenis input atau papan ketik saja belum cukup karena keduanya hanya membantu membatasi atau mempermudah proses memasukkan data, bukan menjamin bahwa data tersebut benar. Misalnya, pengguna masih dapat memasukkan URL dengan format yang salah pada kolom teks. Oleh karena itu, validator tetap diperlukan untuk memeriksa isi data sebelum diproses.
+
+#### AI Disclosure
+
+Dalam pengerjaan Tugas 8, saya menggunakan ChatGPT sebagai alat bantu untuk memahami konsep Flutter, menyusun struktur formulir, memperbaiki navigasi, dan mengevaluasi kode.
+
+Bantuan AI digunakan secara spesifik pada:
+- Memahami penggunaan `StatefulWidget`, `Form`, `GlobalKey<FormState>`, dan validator.
+- Menyusun rancangan halaman formulir Pengalaman dengan tujuh input, yaitu posisi/jabatan, nama organisasi, jenis pengalaman, deskripsi, tanggal mulai, tanggal selesai, dan link bukti pengalaman.
+- Membantu memahami penggunaan `Navigator.push()`, `Navigator.pushReplacement()`, dan `Navigator.pop()`.
+- Membantu mengidentifikasi kemungkinan kesalahan pada import, navigasi Drawer, dan validasi formulir.
+
+
+Strategi prompting yang digunakan adalah memberikan instruksi secara bertahap, menyertakan potongan kode atau pesan error, kemudian meminta penjelasan dan solusi untuk bagian yang sedang dikerjakan. Setelah memperoleh saran, saya memeriksa kembali kode dan menyesuaikannya dengan struktur proyek yang sudah ada.
+
+Saya tidak langsung menganggap seluruh hasil AI benar. Saran AI tetap perlu diperiksa karena AI dapat memberikan kode yang belum tentu sesuai dengan struktur proyek, kebutuhan tugas, atau versi Flutter yang digunakan. Oleh karena itu, saya melakukan penyesuaian manual pada import file, callback Drawer, navigasi antarhalaman, dan penerapan validasi agar sesuai dengan kebutuhan aplikasi.
+
+Dengan demikian, ChatGPT digunakan sebagai pendamping belajar dan debugging, sedangkan pemahaman, pemeriksaan, pengujian, dan keputusan akhir terhadap implementasi tetap saya lakukan sendiri.
+
+### 4. Bukti Penggunaan AI
+https://chatgpt.com/share/6b039daa-d8fc-83ec-a44d-f71c799db5f5

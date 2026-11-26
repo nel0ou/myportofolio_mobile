@@ -1,10 +1,11 @@
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:myportofolio_mobile/screens/project_form.dart';
 import 'package:myportofolio_mobile/screens/experience_form.dart';
-import 'package:myportofolio_mobile/services/api_service.dart';
+import 'package:myportofolio_mobile/screens/project_list_screen.dart';
+import 'package:myportofolio_mobile/screens/login_screen.dart';
+import 'package:myportofolio_mobile/services/auth_state.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 import 'package:myportofolio_mobile/widgets/project_card.dart';
 
@@ -22,27 +23,39 @@ class MyHomePage extends StatelessWidget {
     ItemHomepage('Logout', Icons.logout, Colors.red),
   ];
 
+  // Membuka form proyek hanya jika pengguna sudah login.
+  Future<void> _openProjectForm(BuildContext context) async {
+    final authState = context.read<AuthState>();
+
+    if (!authState.isLoggedIn) {
+      final result = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+
+      if (result != true || !context.mounted) return;
+    }
+
+    if (!context.mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProjectFormPage()),
+    );
+  }
+
   void _handleMenuTap(BuildContext context, ItemHomepage item) {
     if (item.name == 'Lihat Proyek') {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const ProjectListPage(),
-        ),
+        MaterialPageRoute(builder: (context) => const ProjectListScreen()),
       );
     } else if (item.name == 'Tambah Proyek') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ProjectFormPage(),
-        ),
-      );
+      _openProjectForm(context);
     } else if (item.name == 'Pengalaman') {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const ExperienceFormPage(),
-        ),
+        MaterialPageRoute(builder: (context) => const ExperienceFormPage()),
       );
     } else if (item.name == 'Logout') {
       _handleLogout(context);
@@ -50,35 +63,27 @@ class MyHomePage extends StatelessWidget {
   }
 
   Future<void> _handleLogout(BuildContext context) async {
-    if (ApiService.token == null) {
+    final authState = context.read<AuthState>();
+
+    if (!authState.isLoggedIn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Belum ada token login.'),
-        ),
+        const SnackBar(content: Text('Belum ada pengguna yang login.')),
       );
       return;
     }
 
     try {
-      final response = await ApiService.logout();
+      await authState.logout();
 
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            response.statusCode == 204
-                ? 'Logout berhasil.'
-                : 'Logout gagal: ${response.statusCode}',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Logout berhasil.')));
     } catch (e) {
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
     }
   }
 
@@ -88,10 +93,7 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'MyPortfolio',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -102,20 +104,13 @@ class MyHomePage extends StatelessWidget {
         },
         onAddProjectTap: () {
           Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ProjectFormPage(),
-            ),
-          );
+          _openProjectForm(context);
         },
         onExperienceTap: () {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ExperienceFormPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const ExperienceFormPage()),
           );
         },
       ),
@@ -127,22 +122,13 @@ class MyHomePage extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: InfoCard(
-                      title: 'NPM',
-                      content: npm,
-                    ),
+                    child: InfoCard(title: 'NPM', content: npm),
                   ),
                   Expanded(
-                    child: InfoCard(
-                      title: 'Nama',
-                      content: nama,
-                    ),
+                    child: InfoCard(title: 'Nama', content: nama),
                   ),
                   Expanded(
-                    child: InfoCard(
-                      title: 'Kelas',
-                      content: kelas,
-                    ),
+                    child: InfoCard(title: 'Kelas', content: kelas),
                   ),
                 ],
               ),
@@ -150,10 +136,7 @@ class MyHomePage extends StatelessWidget {
               const Text(
                 'Selamat datang di MyPortfolio Mobile!',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               const SizedBox(height: 24),
               GridView.count(
@@ -178,142 +161,11 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class ProjectListPage extends StatelessWidget {
-  const ProjectListPage({super.key});
-
-  Future<List<dynamic>> _fetchProjects() async {
-    final response = await ApiService.getProjects();
-
-    if (response.statusCode != 200) {
-      throw Exception(
-        'Gagal mengambil proyek. HTTP ${response.statusCode}: ${response.body}',
-      );
-    }
-
-    final decoded = jsonDecode(response.body);
-
-    if (decoded is List) {
-      return decoded;
-    }
-
-    if (decoded is Map && decoded['results'] is List) {
-      return decoded['results'] as List<dynamic>;
-    }
-
-    throw Exception('Format data proyek dari server tidak sesuai.');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar Proyek'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _fetchProjects(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${snapshot.error}',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProjectListPage(),
-                          ),
-                        );
-                      },
-                      child: const Text('Coba Lagi'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          final projects = snapshot.data ?? [];
-
-          if (projects.isEmpty) {
-            return const Center(
-              child: Text('Belum ada proyek.'),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: projects.length,
-            itemBuilder: (context, index) {
-              final project = projects[index];
-
-              if (project is! Map) {
-                return const SizedBox.shrink();
-              }
-
-              final title = project['title'] ??
-                  project['name'] ??
-                  project['nama'] ??
-                  'Proyek ${index + 1}';
-
-              final description = project['description'] ??
-                  project['deskripsi'] ??
-                  'Tidak ada deskripsi.';
-
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    child: Icon(Icons.folder),
-                  ),
-                  title: Text(
-                    title.toString(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(description.toString()),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
 class InfoCard extends StatelessWidget {
   final String title;
   final String content;
 
-  const InfoCard({
-    super.key,
-    required this.title,
-    required this.content,
-  });
+  const InfoCard({super.key, required this.title, required this.content});
 
   @override
   Widget build(BuildContext context) {
@@ -323,17 +175,9 @@ class InfoCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              content,
-              textAlign: TextAlign.center,
-            ),
+            Text(content, textAlign: TextAlign.center),
           ],
         ),
       ),

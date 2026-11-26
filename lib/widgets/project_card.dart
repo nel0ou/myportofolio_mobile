@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class ItemHomepage {
@@ -13,11 +12,7 @@ class ItemCard extends StatelessWidget {
   final ItemHomepage item;
   final VoidCallback onTap;
 
-  const ItemCard({
-    super.key,
-    required this.item,
-    required this.onTap,
-  });
+  const ItemCard({super.key, required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -31,18 +26,12 @@ class ItemCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                item.icon,
-                color: Colors.white,
-                size: 30,
-              ),
+              Icon(item.icon, color: Colors.white, size: 30),
               const SizedBox(height: 8),
               Text(
                 item.name,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
+                style: const TextStyle(color: Colors.white),
               ),
             ],
           ),

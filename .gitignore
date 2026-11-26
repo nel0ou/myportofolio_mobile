@@ -1,3 +1,4 @@
+
 # Miscellaneous
 *.class
 *.log
@@ -32,6 +33,9 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+
+# Generated json_serializable files
+*.g.dart
 
 # Symbolication related
 app.*.symbols

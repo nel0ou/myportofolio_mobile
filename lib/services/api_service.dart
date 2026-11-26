@@ -1,5 +1,5 @@
-
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -19,34 +19,20 @@ class ApiService {
 
   // Mengambil daftar project.
   static Future<http.Response> getProjects() async {
-    return await http.get(
-      Uri.parse('$baseUrl/projects/'),
-      headers: headers,
-    );
+    return await http.get(Uri.parse('$baseUrl/projects/'), headers: headers);
   }
 
   // Mengambil daftar experience.
   static Future<http.Response> getExperiences() async {
-    return await http.get(
-      Uri.parse('$baseUrl/experiences/'),
-      headers: headers,
-    );
+    return await http.get(Uri.parse('$baseUrl/experiences/'), headers: headers);
   }
 
   // Login dan menyimpan token.
-  static Future<http.Response> login(
-    String username,
-    String password,
-  ) async {
+  static Future<http.Response> login(String username, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/token/'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': username, 'password': password}),
     );
 
     if (response.statusCode == 200) {
@@ -64,8 +50,7 @@ class ApiService {
       headers: headers,
     );
 
-    if (response.statusCode == 200 ||
-        response.statusCode == 204) {
+    if (response.statusCode == 200 || response.statusCode == 204) {
       token = null;
     }
 

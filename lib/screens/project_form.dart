@@ -1,8 +1,12 @@
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:myportofolio_mobile/models/project.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
-import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 import 'package:myportofolio_mobile/screens/experience_form.dart';
+import 'package:myportofolio_mobile/services/api_client.dart';
+import 'package:myportofolio_mobile/services/auth_state.dart';
+import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 
 class ProjectFormPage extends StatefulWidget {
   const ProjectFormPage({super.key});
@@ -20,6 +24,8 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
   String _technologies = '';
   String _projectLink = '';
 
+  bool _isSaving = false;
+
   final List<String> _categories = [
     'Web Development',
     'Mobile Development',
@@ -27,6 +33,64 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
     'Data Science',
     'Other',
   ];
+
+  // Mengirim data proyek ke Django.
+  Future<void> _saveProject() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final authState = context.read<AuthState>();
+    final apiClient = context.read<ApiClient>();
+
+    final token = authState.token;
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Silakan login terlebih dahulu.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      final project = Project(
+        title: _projectName.trim(),
+        description: _description.trim(),
+        techStack: _technologies.trim(),
+        projectUrl: _projectLink.trim(),
+      );
+
+      await apiClient.createProject(project, token: token);
+
+      if (!mounted) return;
+
+      setState(() {
+        _isSaving = false;
+      });
+
+      _showSuccessDialog();
+    } on ApiException catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isSaving = false;
+      });
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal menyimpan proyek: $e')));
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isSaving = false;
+      });
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+    }
+  }
 
   void _showSuccessDialog() {
     showDialog(
@@ -77,49 +141,33 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text('Add Project Form'),
-        ),
+        title: const Center(child: Text('Add Project Form')),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-
-
       drawer: LeftDrawer(
         onHomeTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const MyHomePage(),
-            ),
+            MaterialPageRoute(builder: (context) => const MyHomePage()),
           );
         },
         onAddProjectTap: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ProjectFormPage(),
-            ),
-          );
+          Navigator.pop(context);
         },
         onExperienceTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ExperienceFormPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const ExperienceFormPage()),
           );
         },
       ),
-
-
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === Project Name ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -130,12 +178,10 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _projectName = value ?? '';
-                    });
+                  onChanged: (value) {
+                    _projectName = value;
                   },
-                  validator: (String? value) {
+                  validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Nama proyek tidak boleh kosong!';
                     }
@@ -143,8 +189,6 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                   },
                 ),
               ),
-
-              // === Description ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -156,12 +200,10 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _description = value ?? '';
-                    });
+                  onChanged: (value) {
+                    _description = value;
                   },
-                  validator: (String? value) {
+                  validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Deskripsi proyek tidak boleh kosong!';
                     }
@@ -169,8 +211,6 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                   },
                 ),
               ),
-
-              // === Category ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButtonFormField<String>(
@@ -187,15 +227,13 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                       child: Text(category),
                     );
                   }).toList(),
-                  onChanged: (String? newValue) {
+                  onChanged: (newValue) {
                     setState(() {
                       _category = newValue ?? 'Web Development';
                     });
                   },
                 ),
               ),
-
-              // === Technologies ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -206,15 +244,11 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _technologies = value ?? '';
-                    });
+                  onChanged: (value) {
+                    _technologies = value;
                   },
                 ),
               ),
-
-              // === Project Link ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -225,35 +259,26 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _projectLink = value ?? '';
-                    });
+                  onChanged: (value) {
+                    _projectLink = value;
                   },
                 ),
               ),
-
-              // === Save Button ===
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all(Colors.indigo),
+                      backgroundColor: WidgetStateProperty.all(Colors.indigo),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _showSuccessDialog();
-                      }
-                    },
-                    child: const Text(
-                      'Save',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
+                    onPressed: _isSaving ? null : _saveProject,
+                    child: _isSaving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'Save',
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               ),

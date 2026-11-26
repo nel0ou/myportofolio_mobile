@@ -7,8 +7,7 @@ class ExperienceFormPage extends StatefulWidget {
   const ExperienceFormPage({super.key});
 
   @override
-  State<ExperienceFormPage> createState() =>
-      _ExperienceFormPageState();
+  State<ExperienceFormPage> createState() => _ExperienceFormPageState();
 }
 
 class _ExperienceFormPageState extends State<ExperienceFormPage> {
@@ -16,10 +15,8 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
   final _formKey = GlobalKey<FormState>();
 
   // Controller untuk menampilkan tanggal yang dipilih.
-  final TextEditingController _startDateController =
-      TextEditingController();
-  final TextEditingController _endDateController =
-      TextEditingController();
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
 
   String _position = '';
   String _organization = '';
@@ -158,25 +155,19 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
         onHomeTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const MyHomePage(),
-            ),
+            MaterialPageRoute(builder: (context) => const MyHomePage()),
           );
         },
         onAddProjectTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ProjectFormPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const ProjectFormPage()),
           );
         },
         onExperienceTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ExperienceFormPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const ExperienceFormPage()),
           );
         },
       ),
@@ -336,8 +327,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                     if (_endDate == null) {
                       return 'Tanggal selesai wajib dipilih!';
                     }
-                    if (_startDate != null &&
-                        _endDate!.isBefore(_startDate!)) {
+                    if (_startDate != null && _endDate!.isBefore(_startDate!)) {
                       return 'Tanggal selesai tidak boleh sebelum tanggal mulai!';
                     }
                     return null;
@@ -387,8 +377,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all(Colors.indigo),
+                      backgroundColor: WidgetStateProperty.all(Colors.indigo),
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
